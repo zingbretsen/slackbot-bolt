@@ -1,0 +1,138 @@
+version: '3'
+
+services:
+
+  dashy:
+    image: lissy93/dashy:latest
+    volumes:
+    - ./dashydata:/app/public/
+    ports:
+    - 4000:80
+
+  mariadb:
+    image: mariadb:10.7
+    restart: always
+    env_file:
+      - ./mariadb.env
+    network_mode: host
+    volumes:
+      - homeassistant_db:/var/lib/mysql
+      - ./mariadb/mariadb.cnf:/etc/mysql/mariadb.cnf
+
+  home-assistant:
+    image: my-home-assistant
+    build:
+      context: home-assistant
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: host
+    volumes:
+      - ./hassio/config:/config/
+      - /etc/localtime:/etc/localtime:ro
+      - /dev/ttyACM0:/dev/ttyACM0
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+    depends_on:
+      - mariadb
+
+  nginx_proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./nginx_proxy_data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+  uptime:
+    image: louislam/uptime-kuma:latest
+    ports:
+    - 3001:3001
+    volumes:
+    - uptime-kuma:/app/data
+
+  nextcloud:
+    image: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./nextcloud/html:/var/www/html
+      - ./nextcloud/db:/var/www/db
+
+
+  portainer:
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - 8000:8000
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  registry:
+    image: registry:2
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - registry:/var/lib/registry
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+    - 1883:2883 
+    - 9001:9001
+    volumes:
+    - ./mqtt_config/:/mosquitto/config/
+
+  gitlab:
+    image: 'gitlab/gitlab-ee:latest'
+    restart: always
+    hostname: 'gitlab.zachiphoto.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.zachiphoto.com'
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+      - '980:80'
+      - '9443:443'
+      - '922:22'
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    shm_size: '256m'
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
+  nodered:
+    image: nodered/node-red
+    ports:
+    - 1880:1880
+    volumes:
+    - nodereddata:/data
+
+volumes:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:
+  neo4j-data:
+  nginx:
+    #huginn_db:
+  smokeping_config:
+  smokeping_data:
+  portainer_data:
+  homeassistant_db:
+  bitwarden:
+  bitwarden_logs:
+  registry:
+  nodereddata:
+  dashydata:
+  uptime-kuma:

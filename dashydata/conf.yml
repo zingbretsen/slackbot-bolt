@@ -1,0 +1,60 @@
+pageInfo:
+  title: Dashy
+  description: Welcome to your new dashboard!
+  navLinks:
+appConfig:
+  theme: colorful
+  layout: auto
+  iconSize: medium
+  language: en
+sections:
+  - name: Services
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Home Assistant
+        description: HA Instance
+        url: http://192.168.1.18:8123
+        target: newtab
+        id: 0_836_homeassistant
+      - title: Portainer
+        url: http://192.168.1.18:9000
+        target: newtab
+        id: 1_836_portainer
+      - title: nginx proxy
+        url: http://192.168.1.18:81
+        target: newtab
+        id: 2_836_nginxproxy
+      - title: nextcloud
+        url: http://192.168.1.18:8080
+        target: newtab
+        id: 3_836_nextcloud
+      - title: adguardhome
+        url: http://192.168.1.18:8002
+        target: newtab
+        id: 4_836_adguardhome
+      - title: mqtt
+        icon: ''
+        url: http://192.168.1.18:9001
+        target: newtab
+        id: 5_836_mqtt
+      - title: gitlab
+        url: https://192.168.1.18:9443
+        target: newtab
+        id: 6_836_gitlab
+      - title: nodered
+        url: http://192.168.1.18:1880
+        target: newtab
+        id: gitlab
+      - title: uptime
+        url: http://192.168.1.18:3001
+        target: newtab
+        id: uptime_kuma
+
+
+
+
